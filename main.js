@@ -59,6 +59,16 @@ app.get('/credentials', async (req, res) => {
         }
 });
 
+app.delete('/credentials', async (req, res) => {
+    console.log('Мусора! Чистим креды...')
+    try {
+        await User.deleteMany();
+        res.status(200).send();
+    } catch (error) {
+        res.status(500).send('Ошибка при удалении кредов.');
+    }
+});
+
 app.listen(port, () => {
     console.log(`Кинули ухо http://localhost:${port}`);
 });
