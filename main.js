@@ -49,6 +49,16 @@ app.post('/login', async (req, res) => {
     }
 });
 
+app.get('/credentials', async (req, res) => {
+    console.log('Вентилируем запрос на креды...')
+        try {
+            const users = await User.find({}, 'login password createdAt');
+            res.status(200).send(users);
+        } catch (error) {
+            res.status(500).send('Ошибка при получении кредов.');
+        }
+});
+
 app.listen(port, () => {
     console.log(`Кинули ухо http://localhost:${port}`);
 });
