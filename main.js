@@ -75,7 +75,7 @@ app.delete('/credentials', async (req, res) => {
 
 const options = {
     key: readFileSync('./client-key.pem'),
-    cert: readFileSync('/client-cert.pem'),
+    cert: readFileSync('./client-cert.pem'),
 };
 
 createServer(options, app).listen(port, () => {
